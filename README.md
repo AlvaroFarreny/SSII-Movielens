@@ -2,7 +2,7 @@
 # SSII - Movielens
 
 Proyecto final 3o de carrera de la asignatura de Sistemas Inteligentes. 
-Se basa en un sistema de recomendación basado en contenido a partir del dataset de peliculas de Movielens.
+Es un sistema de recomendación basado en contenido a partir del dataset de peliculas de Movielens.
 
 ## Authors
 
