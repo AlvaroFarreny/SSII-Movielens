@@ -51,6 +51,17 @@ movies.year = movies.year.dt.year
 movies.title = movies.title.str[:-7]
 
 headMovies = movies.head()
+'''
+tree = ttk.Treeview()
+
+# Itera a través de las columnas del DataFrame y las agrega a ttk.Treeview
+for col in headMovies.columns:
+	tree.heading(col, text=col)
+	tree.column(col, width=100)
+# Itera a través de las filas del DataFrame y las agrega a ttk.Treeview
+for index, row in headMovies.iterrows():
+	tree.insert('', 'end', values=list(row))
+	'''
 
 # TF-IDF para las diferentes combinaciones de géneros
 tf = TfidfVectorizer(analyzer=lambda s: (c for i in range(1,4)
@@ -107,20 +118,25 @@ class Ventana(Frame):
 		self.frame_uno.columnconfigure(0, weight=1)
 		self.frame_uno.columnconfigure(1, weight=1)
 		
-	def pantalla_entrenamiento(self):
+	def pantalla_pelicula(self):
 		self.paginas.select([self.frame_uno])
 		self.frame_uno.columnconfigure(0, weight=1)
 		self.frame_uno.columnconfigure(1, weight=1)
 
-	def pantalla_clasificacion(self):
+	def pantalla_usuario(self):
 		self.paginas.select([self.frame_dos])
 		self.frame_dos.columnconfigure(0, weight=1)
 		self.frame_dos.columnconfigure(1, weight=1)
 
+	def pantalla_webscraping(self):
+		self.paginas.select([self.frame_tres])
+		self.frame_tres.columnconfigure(0, weight=1)
+		self.frame_tres.columnconfigure(1, weight=1)
+
 	def nav(self):
-		self.imagen_entrenamiento = PhotoImage(file ='./img/ranking.png')
-		self.imagen_clasificacion = PhotoImage(file ='./img/user.png')
-		#self.imagen_webscraping = PhotoImage(file ='./img/webscraping.png')
+		self.imagen_pelicula = PhotoImage(file ='./img/ranking.png')
+		self.imagen_usuario = PhotoImage(file ='./img/user.png')
+		self.imagen_webscraping = PhotoImage(file ='./img/movie.png')
 		self.imagen_home = PhotoImage(file ='./img/home.png')
 		self.logo = PhotoImage(file ='./img/logo.png')
 
@@ -129,12 +145,14 @@ class Ventana(Frame):
 		self.frame_inicio = Frame(self.paginas, bg='#ffbe57')
 		self.frame_uno = Frame(self.paginas, bg='white')
 		self.frame_dos = Frame(self.paginas, bg='white')
+		self.frame_tres = Frame(self.paginas, bg='white')
 		self.paginas.add(self.frame_inicio, image = self.imagen_home)
-		self.paginas.add(self.frame_uno, image = self.imagen_entrenamiento)
-		self.paginas.add(self.frame_dos, image = self.imagen_clasificacion)
+		self.paginas.add(self.frame_uno, image = self.imagen_pelicula)
+		self.paginas.add(self.frame_dos, image = self.imagen_usuario)
+		self.paginas.add(self.frame_tres, image = self.imagen_webscraping)
 
 		# Inicio
-		Label(self.frame_top,text='Bienvenido', bg='white', fg='black', font=('Arial', 25, 'bold')).pack(expand=1, pady=12,)
+		Label(self.frame_top,text='Bienvenido a nuestro Proyecto Final de SSII', bg='white', fg='black', font=('Arial', 25, 'bold')).pack(expand=1, pady=12,)
 		Label(self.frame_inicio ,image= self.logo, bg='white').pack(expand=1, pady=0)
 		Label(self.frame_inicio, text= 'Para empezar, seleccione un icono del menú.', bg='#ffbe57', fg= 'white', font= ('Arial', 20, 'bold')).pack(expand=1)
 
@@ -143,10 +161,14 @@ class Ventana(Frame):
 		Label(self.frame_uno, text="Introduzca el título de una Película:", bg='white', fg= 'black', font= ('Arial', 12, 'bold')).grid(column=1,row=1)
 		Entry(self.frame_uno, textvariable=self.peli, font=('Arial', 15), highlightthickness=3).grid(column=1,row=2, pady=20)
 		Button(self.frame_uno, width=12, text='RECOMENDAR!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : genre_recommendations(self.peli.get(), similitud_df, movies[['title', 'genres']])).grid(column=1, row=3, padx=50)
-		Table(self.frame_uno, dataframe=headMovies, showtoolbar=True, showstatusbar=True).grid(column=1,row=4, pady=10)
+		#Table(self.frame_uno, dataframe=headMovies, showtoolbar=True, showstatusbar=True).grid(column=1,row=4, pady=10)
+		
 
 		# Página 2 - 
 		Label(self.frame_dos, text='RECOMENDAR PELÍCULAS EN BASE A UN USUARIO', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).grid(column=1, row=0, pady=40, padx=180)
+
+		# Página 3 - Web Scraping
+		Label(self.frame_tres, text='WEB SCRAPING', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).grid(column=1, row=0, pady=40, padx=180)
 		
 # Settings ventana
 if __name__ == "__main__":
