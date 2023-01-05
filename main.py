@@ -38,30 +38,17 @@ ratings = pd.read_csv("./ml-latest-small/ratings.csv", sep=",")
 tags = pd.read_csv("./ml-latest-small/tags.csv", sep=",")
 links = pd.read_csv("./ml-latest-small/links.csv", sep=",")
 
-# Eliminamos nulos
+''' Eliminamos nulos
 movies.dropna(inplace=True)
 ratings.dropna(inplace=True)
 tags.dropna(inplace=True)
-links.dropna(inplace=True)
+links.dropna(inplace=True)'''
 
 # Extraemos el año del título
 movies['year'] = movies.title.str.extract("\((\d{4})\)", expand=True)
 movies.year = pd.to_datetime(movies.year, format='%Y')
 movies.year = movies.year.dt.year
 movies.title = movies.title.str[:-7]
-
-headMovies = movies.head()
-'''
-tree = ttk.Treeview()
-
-# Itera a través de las columnas del DataFrame y las agrega a ttk.Treeview
-for col in headMovies.columns:
-	tree.heading(col, text=col)
-	tree.column(col, width=100)
-# Itera a través de las filas del DataFrame y las agrega a ttk.Treeview
-for index, row in headMovies.iterrows():
-	tree.insert('', 'end', values=list(row))
-	'''
 
 # TF-IDF para las diferentes combinaciones de géneros
 tf = TfidfVectorizer(analyzer=lambda s: (c for i in range(1,4)
@@ -152,28 +139,32 @@ class Ventana(Frame):
 		self.paginas.add(self.frame_tres, image = self.imagen_webscraping)
 
 		# Inicio
-		Label(self.frame_top,text='Bienvenido a nuestro Proyecto Final de SSII', bg='white', fg='black', font=('Arial', 25, 'bold')).pack(expand=1, pady=12,)
-		Label(self.frame_inicio ,image= self.logo, bg='white').pack(expand=1, pady=0)
+		cl = Button(self.frame_top, text="Exit",width=5, height=2, bg='red2', fg='white', font= ('Arial', 8, 'bold'), command=self.quit)
+		cl.place(relx=0.965, rely=0.10)
+		Label(self.frame_top, text='Bienvenido a nuestro Proyecto Final de SSII', bg='white', fg='black', font=('Arial', 25, 'bold')).place(relx=0.28, rely=0.10)
+		Label(self.frame_inicio, image= self.logo, bg='white').pack(expand=1, pady=0)
 		Label(self.frame_inicio, text= 'Para empezar, seleccione un icono del menú.', bg='#ffbe57', fg= 'white', font= ('Arial', 20, 'bold')).pack(expand=1)
 
 		# Página 1 - Recomendador en base a una película
-		Label(self.frame_uno, width=60, text='RECOMENDAR PELÍCULAS EN BASE A UNA PELÍCULA', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).grid(column=1, row=0, pady=40, padx=160)
-		Label(self.frame_uno, text="Introduzca el título de una Película:", bg='white', fg= 'black', font= ('Arial', 12, 'bold')).grid(column=1,row=1)
-		Entry(self.frame_uno, textvariable=self.peli, font=('Arial', 15), highlightthickness=3).grid(column=1,row=2, pady=20)
-		Button(self.frame_uno, width=12, text='RECOMENDAR!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : genre_recommendations(self.peli.get(), similitud_df, movies[['title', 'genres']])).grid(column=1, row=3, padx=50)
-		#Table(self.frame_uno, dataframe=headMovies, showtoolbar=True, showstatusbar=True).grid(column=1,row=4, pady=10)
+		Label(self.frame_uno, width=60, text='RECOMENDAR PELÍCULAS EN BASE A UNA PELÍCULA', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.26, rely=0.05)
+		Label(self.frame_uno, text="Introduzca el título de una Película:", bg='white', fg= 'black', font= ('Arial', 12, 'bold')).place(relx=0.41, rely=0.15)
+		Entry(self.frame_uno, textvariable=self.peli, font=('Arial', 15), highlightthickness=3).place(relx=0.42, rely=0.20)
+		Button(self.frame_uno, width=12, text='RECOMENDAR!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : genre_recommendations(self.peli.get(), similitud_df, movies[['title', 'genres']])).place(relx=0.452, rely=0.28)
+		self.pt = Table(self.frame_uno, width=760, height=420, dataframe=movies)
+		#, showtoolbar=True, showstatusbar=True
+		self.pt.show()
+		self.pt.place(relx=0.25, rely=0.37)
 		
-
 		# Página 2 - 
-		Label(self.frame_dos, text='RECOMENDAR PELÍCULAS EN BASE A UN USUARIO', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).grid(column=1, row=0, pady=40, padx=180)
+		Label(self.frame_dos, text='RECOMENDAR PELÍCULAS EN BASE A UN USUARIO', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.335, rely=0.05)
 
 		# Página 3 - Web Scraping
-		Label(self.frame_tres, text='WEB SCRAPING', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).grid(column=1, row=0, pady=40, padx=180)
+		Label(self.frame_tres, text='WEB SCRAPING', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.46, rely=0.05)
 		
 # Settings ventana
 if __name__ == "__main__":
     ventana = Tk()
-    ventana.title("Rady Recipes")
+    ventana.title("SSII - MovieLens")
     ventana.resizable(True, True)
     ventana.attributes('-fullscreen',True)
     ventana.call('wm', 'iconphoto', ventana._w, PhotoImage(file='./img/logo.png'))
