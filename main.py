@@ -19,6 +19,7 @@ import requests as rq
 import time
 import math
 import datetime
+import re
 
 from sklearn.neighbors import KNeighborsClassifier as knn
 from sklearn.metrics import confusion_matrix
@@ -160,7 +161,18 @@ class Ventana(Frame):
 
 		# Página 3 - Web Scraping
 		Label(self.frame_tres, text='WEB SCRAPING', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.46, rely=0.05)
+
+		fila_seleccionada = 0
 		
+		def seleccionPelicula(event):
+			rowclicked_single = self.pt.get_row_clicked(event)
+			self.pt.setSelectedRow(rowclicked_single)
+			self.pt.redraw()
+			fila_seleccionada = rowclicked_single
+			labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(movies.loc[fila_seleccionada, 'title']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.3, rely=0.15)
+
+		fila = self.pt.rowheader.bind('<Button-1>', seleccionPelicula)
+
 # Settings ventana
 if __name__ == "__main__":
     ventana = Tk()
