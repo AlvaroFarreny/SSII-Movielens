@@ -19,15 +19,12 @@ movies = pd.read_csv("./ml-latest-small/movies.csv", sep=",")
 ratings = pd.read_csv("./ml-latest-small/ratings.csv", sep=",")
 tags = pd.read_csv("./ml-latest-small/tags.csv", sep=",")
 links = pd.read_csv("./ml-latest-small/links.csv", sep=",")
-sinopsis = pd.read_csv("./ml-latest-small/sinopsisDB.csv", sep=",")
-
-#sinopsis = sinopsis.sort_values('moveId', ascending=True)
-sinopsis = sinopsis.loc[~sinopsis.index.duplicated()]
-''' Eliminamos nulos
-movies.dropna(inplace=True)
-ratings.dropna(inplace=True)
-tags.dropna(inplace=True)
-links.dropna(inplace=True)'''
+similitudG = pd.read_csv("./ml-latest-small/similitudG.csv", sep=",")
+similitudS1 = pd.read_csv("./ml-latest-small/similitudS1.csv", sep=",")
+similitudS2 = pd.read_csv("./ml-latest-small/similitudS2.csv", sep=",")
+similitudS3 = pd.read_csv("./ml-latest-small/similitudS3.csv", sep=",")
+similitudS4 = pd.read_csv("./ml-latest-small/similitudS4.csv", sep=",")
+similitudS5 = pd.read_csv("./ml-latest-small/similitudS5.csv", sep=",")
 
 # Extraemos el año del título
 movies['year'] = movies.title.str.extract("\((\d{4})\)", expand=True)
@@ -38,16 +35,6 @@ movies.title = movies.title.str[:-7]
 # TF-IDF para las diferentes combinaciones de géneros
 tf = TfidfVectorizer(analyzer=lambda s: (c for i in range(1,4)
                      for c in combinations(s.split('|'), r=i)))
-
-# Formamos nuestra matriz con los géneros
-matrizG = tf.fit_transform(movies.genres)
-matrizS = tf.fit_transform(sinopsis.sinopsis)
-# Aplicamos a esta matriz la similitud del coseno
-similitudG = cosine_similarity(matrizG)
-similitudS = cosine_similarity(matrizS)
-# Creamos un DF con esta similitud
-similitud_dfG = pd.DataFrame(similitudG, index=movies['title'], columns=movies['title'])
-similitud_dfS = pd.DataFrame(similitudS, index=movies['title'], columns=movies['title'])
 
 class Ventana(Frame):
 	def __init__(self, master, *args):
