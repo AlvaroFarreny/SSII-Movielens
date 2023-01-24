@@ -25,6 +25,7 @@ similitudS2 = pd.read_csv("./ml-latest-small/similitudS2.csv", sep=",")
 similitudS3 = pd.read_csv("./ml-latest-small/similitudS3.csv", sep=",")
 similitudS4 = pd.read_csv("./ml-latest-small/similitudS4.csv", sep=",")
 similitudS5 = pd.read_csv("./ml-latest-small/similitudS5.csv", sep=",")
+sinopsisdf = pd.read_csv("./ml-latest-small/sinopsisDB.csv", sep=",")
 
 # Extraemos el año del título
 movies['year'] = movies.title.str.extract("\((\d{4})\)", expand=True)
@@ -160,7 +161,10 @@ class Ventana(Frame):
 			self.pt.redraw()
 			fila_seleccionada = rowclicked_single
 			labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(movies.loc[fila_seleccionada, 'title']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.35, rely=0.15)
-
+			movie_id_sinopsis = int(movies.loc[fila_seleccionada, 'movieId'])
+			labSinopsis = Label(self.frame_tres, text='Sinopsis: ' + str(sinopsisdf.loc[movie_id_sinopsis, 'sinopsis']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.35, rely=0.35)
+			labRating = Label(self.frame_tres, text='Rating: ' + str(sinopsisdf.loc[movie_id_sinopsis, 'rating']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.35, rely=0.55)
+	
 		fila = self.pt.rowheader.bind('<Button-1>', seleccionPelicula)
 
 # Settings ventana
