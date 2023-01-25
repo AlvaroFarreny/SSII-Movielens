@@ -349,11 +349,11 @@ class Ventana(Frame):
             fila_seleccionada = rowclicked_single
             print(fila_seleccionada)
             labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(
-                movies_sinopsis.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.40, rely=0.15)
+                movies_sinopsis.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.15, rely=0.15)
             labSinopsis = Label(self.frame_tres, text='Sinopsis: ' + str(
-                movies_sinopsis.loc[fila_seleccionada, 'sinopsis']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0, rely=0.35)
+                movies_sinopsis.loc[fila_seleccionada, 'sinopsis']), bg='white', wraplength=800, justify=LEFT, fg='black', font=('Arial', 15, 'bold')).place(relx=0.15, rely=0.35)
             labRating = Label(self.frame_tres, text='Rating: ' + str(
-                movies_sinopsis.loc[fila_seleccionada, 'rating']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.15, rely=0.55)
+                movies_sinopsis.loc[fila_seleccionada, 'rating']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.15, rely=0.58)
 
         fila = self.pt.rowheader.bind('<Button-1>', seleccionPelicula)
 
