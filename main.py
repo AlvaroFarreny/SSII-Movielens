@@ -19,6 +19,11 @@ import time
 import math
 import datetime
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
+from sklearn.metrics.pairwise import cosine_similarity
+from itertools import combinations
+
 from tkinter import *
 from tkinter import ttk
 
@@ -27,9 +32,13 @@ movies = pd.read_csv("./ml-latest-small/movies.csv", sep=",")
 ratings = pd.read_csv("./ml-latest-small/ratings.csv", sep=",")
 tags = pd.read_csv("./ml-latest-small/tags.csv", sep=",")
 links = pd.read_csv("./ml-latest-small/links.csv", sep=",")
-similitudG = pd.read_csv("./ml-latest-small/similitudG.csv", sep=",", index_col='title')
-similitudG = similitudG.dropna()
 sinopsisdf = pd.read_csv("./ml-latest-small/sinopsisDB.csv", sep=",")
+
+# Eliminamos nuelos
+movies.dropna(inplace=True)
+ratings.dropna(inplace=True)
+tags.dropna(inplace=True)
+links.dropna(inplace=True)
 
 # Extraemos el año del título
 movies['year'] = movies.title.str.extract("\((\d{4})\)", expand=True)
@@ -37,7 +46,16 @@ movies.year = pd.to_datetime(movies.year, format='%Y')
 movies.year = movies.year.dt.year
 movies.title = movies.title.str[:-7]
 
-print(similitudG)
+# TF-IDF para las diferentes combinaciones de géneros
+tf = TfidfVectorizer(analyzer=lambda s: (c for i in range(1,4)
+                     for c in combinations(s.split('|'), r=i)))
+
+# Formamos nuestra matriz con los géneros
+matriz = tf.fit_transform(movies.genres)
+# Aplicamos a esta matriz la similitud del coseno
+similitud = cosine_similarity(matriz)
+# Creamos un DF con esta similitud
+similitudG= pd.DataFrame(similitud, index=movies['title'], columns=movies['title'])
 
 class Ventana(Frame):
 	def __init__(self, master, *args):
@@ -149,7 +167,7 @@ class Ventana(Frame):
 			self.pt.place(relx=0.25, rely=0.37)
 
 		Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28) #
-		Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesSinopsis(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.34)
+		Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesSinopsis(entryPeli.get(), similitudG, movies['title', 'genres'])).place(relx=0.4, rely=0.34)
 		self.pt = Table(self.frame_uno, width=760, height=420, dataframe=movies)
 		#, showtoolbar=True, showstatusbar=True
 		self.pt.show()
