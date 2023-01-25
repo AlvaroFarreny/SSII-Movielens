@@ -14,16 +14,19 @@ from itertools import combinations
 from tkinter import *
 from tkinter import ttk
 
+import pandas as pd
+import numpy as np
 from zipfile import ZipFile
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from pathlib import Path
-import numpy as np
+import matplotlib.pyplot as plt
 
 
 # Leemos nuestros dataframes
 movies = pd.read_csv("./ml-latest-small/movies.csv", sep=",")
+movies_sinopsis = pd.read_csv("./movies_sinopsis.csv", sep=",")
 ratings_df = pd.read_csv("./ml-latest-small/ratings.csv", sep=",")
 tags = pd.read_csv("./ml-latest-small/tags.csv", sep=",")
 links = pd.read_csv("./ml-latest-small/links.csv", sep=",")
@@ -41,10 +44,6 @@ movies.year = pd.to_datetime(movies.year, format='%Y')
 movies.year = movies.year.dt.year
 movies.title = movies.title.str[:-7]
 
-# TF-IDF para las diferentes combinaciones de géneros
-tf = TfidfVectorizer(analyzer=lambda s: (c for i in range(1, 4)
-                     for c in combinations(s.split('|'), r=i)))
-
 
 class Ventana(Frame):
     def __init__(self, master, *args):
@@ -57,7 +56,7 @@ class Ventana(Frame):
         self.peli = StringVar()
         self.peli.set("")
         # Página 2
-        self.id_usuario = None
+        self.id_usuario = StringVar()
 
         # Settings frame principal
         self.frame_top = Frame(self.master, bg='white', height=50)
@@ -178,12 +177,14 @@ class Ventana(Frame):
               bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.335, rely=0.05)
         Label(self.frame_dos, text="Introduzca el ID de un usuario:", bg='white',
               fg='black', font=('Arial', 12, 'bold')).place(relx=0.41, rely=0.15)
-        ent1 = Entry(self.frame_dos, textvariable=self.id_usuario, font=(
+        ent2 = Entry(self.frame_dos, textvariable=self.id_usuario, font=(
             'Arial', 15), highlightthickness=3).place(relx=0.42, rely=0.20)
         Button(self.frame_dos, width=26, text='RECOMENDAR POR USUARIOS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: recomendar_a_usuario(self.id_usuario)).place(relx=0.4, rely=0.28)
 
         def recomendar_a_usuario(user_id):
+            user_id = int(self.id_usuario.get())
+            print(user_id)
             ratings = ratings_df
             # No queremos trabajar con timestamp
             user_ids = ratings["userId"].unique().tolist()
@@ -241,6 +242,8 @@ class Ventana(Frame):
             recommended_movie_ids = [
                 movie_encoded2movie.get(movies_not_watched[x][0]) for x in top_ratings_indices
             ]
+            Label(self.frame_dos, text="Showing recommendations for user: {}".format(user_id),
+                  bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.35)
 
             print("Showing recommendations for user: {}".format(user_id))
             print("====" * 9)
@@ -253,7 +256,11 @@ class Ventana(Frame):
                 .movieId.values
             )
             movie_df_rows = movies[movies["movieId"].isin(top_movies_user)]
+
+            lista_pelis = []
             for row in movie_df_rows.itertuples():
+                #De aqui queriamos sacarlo para mostrarlo en labels
+                lista_pelis.append(row.title)
                 print(row.title, ":", row.genres)
 
             print("----" * 8)
@@ -275,12 +282,11 @@ class Ventana(Frame):
             self.pt.redraw()
             fila_seleccionada = rowclicked_single
             labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(
-                movies.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.15)
-            movie_id_sinopsis = int(movies.loc[fila_seleccionada, 'movieId'])
+                movies_sinopsis.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.15)
             labSinopsis = Label(self.frame_tres, text='Sinopsis: ' + str(
-                sinopsisdf.loc[movie_id_sinopsis, 'sinopsis']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.35)
+                movies_sinopsis.loc[fila_seleccionada, 'sinopsis']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.35)
             labRating = Label(self.frame_tres, text='Rating: ' + str(
-                sinopsisdf.loc[movie_id_sinopsis, 'rating']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.55)
+                movies_sinopsis.loc[fila_seleccionada, 'rating']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.55)
 
         fila = self.pt.rowheader.bind('<Button-1>', seleccionPelicula)
 
