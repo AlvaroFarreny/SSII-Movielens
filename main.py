@@ -190,8 +190,6 @@ class Ventana(Frame):
         movies_sinopsis2 = movies_sinopsis.drop(columns=["sinopsis", "rating"])
         Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28)
-        Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
-               command=lambda: generarRecomendacionesSinopsis(entryPeli.get(), similitudG, movies['title', 'genres'])).place(relx=0.4, rely=0.34)
         self.pt = Table(self.frame_uno, width=760,
                         height=420, dataframe=movies_sinopsis2)
         # , showtoolbar=True, showstatusbar=True
@@ -351,11 +349,11 @@ class Ventana(Frame):
             fila_seleccionada = rowclicked_single
             print(fila_seleccionada)
             labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(
-                movies_sinopsis.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.15)
+                movies_sinopsis.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.40, rely=0.15)
             labSinopsis = Label(self.frame_tres, text='Sinopsis: ' + str(
-                movies_sinopsis.loc[fila_seleccionada, 'sinopsis']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.35)
+                movies_sinopsis.loc[fila_seleccionada, 'sinopsis']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0, rely=0.35)
             labRating = Label(self.frame_tres, text='Rating: ' + str(
-                movies_sinopsis.loc[fila_seleccionada, 'rating']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.55)
+                movies_sinopsis.loc[fila_seleccionada, 'rating']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.15, rely=0.55)
 
         fila = self.pt.rowheader.bind('<Button-1>', seleccionPelicula)
 
