@@ -27,7 +27,8 @@ movies = pd.read_csv("./ml-latest-small/movies.csv", sep=",")
 ratings = pd.read_csv("./ml-latest-small/ratings.csv", sep=",")
 tags = pd.read_csv("./ml-latest-small/tags.csv", sep=",")
 links = pd.read_csv("./ml-latest-small/links.csv", sep=",")
-similitudG = pd.read_csv("./ml-latest-small/similitudG.csv", sep=",")
+similitudG = pd.read_csv("./ml-latest-small/similitudG.csv", sep=",", index_col='title')
+similitudG = similitudG.dropna()
 sinopsisdf = pd.read_csv("./ml-latest-small/sinopsisDB.csv", sep=",")
 
 # Extraemos el año del título
@@ -35,6 +36,8 @@ movies['year'] = movies.title.str.extract("\((\d{4})\)", expand=True)
 movies.year = pd.to_datetime(movies.year, format='%Y')
 movies.year = movies.year.dt.year
 movies.title = movies.title.str[:-7]
+
+print(similitudG)
 
 class Ventana(Frame):
 	def __init__(self, master, *args):
@@ -106,7 +109,7 @@ class Ventana(Frame):
 		peli = 'none'
 		entryPeli = Entry(self.frame_uno, textvariable=peli, font=('Arial', 15), highlightthickness=3)
 		entryPeli.place(relx=0.42, rely=0.20)
-
+	
 		def generarRecomendacionesGenero(i, M, items, k=10):
 			'''
 			i - nombre de la película
@@ -114,6 +117,7 @@ class Ventana(Frame):
 			items - dataframe de títulos y géneros
 			k - número de recomendaciones
 			'''
+
 			if (i != ''):
 				ventana_secundaria = Toplevel()
 				ventana_secundaria.title("Recomendación por género")
@@ -144,7 +148,7 @@ class Ventana(Frame):
 			self.pt.show()
 			self.pt.place(relx=0.25, rely=0.37)
 
-		Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28)
+		Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28) #
 		Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesSinopsis(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.34)
 		self.pt = Table(self.frame_uno, width=760, height=420, dataframe=movies)
 		#, showtoolbar=True, showstatusbar=True
