@@ -187,26 +187,26 @@ class Ventana(Frame):
                             height=280, dataframe=recomendaciones)
             self.pt.show()
             self.pt.place(relx=0.25, rely=0.37)
-
+        movies_sinopsis2 = movies_sinopsis.drop(columns=["sinopsis", "rating"])
         Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28)
         Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: generarRecomendacionesSinopsis(entryPeli.get(), similitudG, movies['title', 'genres'])).place(relx=0.4, rely=0.34)
         self.pt = Table(self.frame_uno, width=760,
-                        height=420, dataframe=movies)
+                        height=420, dataframe=movies_sinopsis2)
         # , showtoolbar=True, showstatusbar=True
         self.pt.show()
         self.pt.place(relx=0.25, rely=0.44)
 
         # Página 2 - Recomendador en base a un usuario
         Label(self.frame_dos, text='RECOMENDAR PELÍCULAS EN BASE A UN USUARIO',
-            bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.335, rely=0.05)
+              bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.335, rely=0.05)
         Label(self.frame_dos, text="Introduzca el ID de un usuario:", bg='white',
-            fg='black', font=('Arial', 12, 'bold')).place(relx=0.41, rely=0.15)
+              fg='black', font=('Arial', 12, 'bold')).place(relx=0.41, rely=0.15)
         ent2 = Entry(self.frame_dos, textvariable=self.id_usuario, font=(
             'Arial', 15), highlightthickness=3).place(relx=0.42, rely=0.20)
         Button(self.frame_dos, width=26, text='RECOMENDAR POR USUARIOS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
-            command=lambda: recomendar_a_usuario(self.id_usuario)).place(relx=0.4, rely=0.28)
+               command=lambda: recomendar_a_usuario(self.id_usuario)).place(relx=0.4, rely=0.28)
 
         def recomendar_a_usuario(user_id):
             user_id = int(self.id_usuario.get())
@@ -220,11 +220,13 @@ class Ventana(Frame):
             movie2movie_encoded = {x: i for i, x in enumerate(movie_ids)}
             movie_encoded2movie = {i: x for i, x in enumerate(movie_ids)}
             ratings_df["user"] = ratings_df["userId"].map(user2user_encoded)
-            ratings_df["movie"] = ratings_df["movieId"].map(movie2movie_encoded)
+            ratings_df["movie"] = ratings_df["movieId"].map(
+                movie2movie_encoded)
 
             num_users = len(user2user_encoded)
             num_movies = len(movie_encoded2movie)
-            ratings_df["rating"] = ratings_df["rating"].values.astype(np.float32)
+            ratings_df["rating"] = ratings_df["rating"].values.astype(
+                np.float32)
             # min and max ratings will be used to normalize the ratings later
             min_rating = min(ratings_df["rating"])
             max_rating = max(ratings_df["rating"])
@@ -269,7 +271,7 @@ class Ventana(Frame):
                 movie_encoded2movie.get(movies_not_watched[x][0]) for x in top_ratings_indices
             ]
             Label(self.frame_dos, text="Showing recommendations for user: {}".format(user_id),
-                bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.35)
+                  bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.35)
 
             print("Showing recommendations for user: {}".format(user_id))
             print("====" * 9)
@@ -298,7 +300,7 @@ class Ventana(Frame):
                 print(row.title, ":", row.genres)
         # Página 3 - Web Scraping
         Label(self.frame_tres, text='WEB SCRAPING', bg='white', fg='black',
-            font=('Arial', 15, 'bold')).place(relx=0.46, rely=0.05)
+              font=('Arial', 15, 'bold')).place(relx=0.46, rely=0.05)
 
         fila_seleccionada = 0
 
@@ -307,6 +309,7 @@ class Ventana(Frame):
             self.pt.setSelectedRow(rowclicked_single)
             self.pt.redraw()
             fila_seleccionada = rowclicked_single
+            print(fila_seleccionada)
             labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(
                 movies_sinopsis.loc[fila_seleccionada, 'title']), bg='white', fg='black', font=('Arial', 15, 'bold')).place(relx=0.35, rely=0.15)
             labSinopsis = Label(self.frame_tres, text='Sinopsis: ' + str(
