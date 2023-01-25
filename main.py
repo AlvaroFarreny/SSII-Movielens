@@ -208,6 +208,32 @@ class Ventana(Frame):
         Button(self.frame_dos, width=26, text='RECOMENDAR POR USUARIOS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: recomendar_a_usuario(self.id_usuario)).place(relx=0.4, rely=0.28)
 
+        top1 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        top1.place(relx=0.44, rely=0.40)
+        top2 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        top2.place(relx=0.44, rely=0.42)
+        top3 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        top3.place(relx=0.44, rely=0.44)
+
+        rec1 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec1.place(relx=0.44, rely=0.48)
+        rec2 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec2.place(relx=0.44, rely=0.50)
+        rec3 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec3.place(relx=0.44, rely=0.52)
+        rec4 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec4.place(relx=0.44, rely=0.54)
+        rec5 = Label(self.frame_dos, text="",
+                     bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec5.place(relx=0.44, rely=0.56)
+
         def recomendar_a_usuario(user_id):
             user_id = int(self.id_usuario.get())
             print(user_id)
@@ -270,8 +296,12 @@ class Ventana(Frame):
             recommended_movie_ids = [
                 movie_encoded2movie.get(movies_not_watched[x][0]) for x in top_ratings_indices
             ]
-            Label(self.frame_dos, text="Showing recommendations for user: {}".format(user_id),
+            Label(self.frame_dos, text=" -> Mostrando las recomendaciones para el usuario: {}".format(user_id),
                   bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.35)
+            Label(self.frame_dos, text="Estas son tus películas mejor valoradas:",
+                  bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.38)
+            Label(self.frame_dos, text="Estas son las películas que te aconsejamos:",
+                  bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.46)
 
             print("Showing recommendations for user: {}".format(user_id))
             print("====" * 9)
@@ -285,19 +315,29 @@ class Ventana(Frame):
             )
             movie_df_rows = movies[movies["movieId"].isin(top_movies_user)]
 
-            lista_pelis = []
+            lista_pelistop = []
             for row in movie_df_rows.itertuples():
                 # De aqui queriamos sacarlo para mostrarlo en labels
-                lista_pelis.append(row.title)
+                lista_pelistop.append(row.title)
                 print(row.title, ":", row.genres)
+            top1.config(text=" - "+lista_pelistop[0])
+            top2.config(text=" - "+lista_pelistop[1])
+            top3.config(text=" - "+lista_pelistop[2])
 
             print("----" * 8)
             print("Top 10 movie recommendations")
             print("----" * 8)
             recommended_movies = movies[movies["movieId"].isin(
                 recommended_movie_ids)]
+            lista_recomendaciones = []
             for row in recommended_movies.itertuples():
+                lista_recomendaciones.append(row.title)
                 print(row.title, ":", row.genres)
+            rec1.config(text=" - "+lista_recomendaciones[0])
+            rec2.config(text=" - "+lista_recomendaciones[1])
+            rec3.config(text=" - "+lista_recomendaciones[2])
+            rec4.config(text=" - "+lista_recomendaciones[3])
+            rec5.config(text=" - "+lista_recomendaciones[4])
         # Página 3 - Web Scraping
         Label(self.frame_tres, text='WEB SCRAPING', bg='white', fg='black',
               font=('Arial', 15, 'bold')).place(relx=0.46, rely=0.05)
