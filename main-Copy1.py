@@ -16,12 +16,9 @@ from tkinter import ttk
 
 import pandas as pd
 import numpy as np
-from zipfile import ZipFile
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-from pathlib import Path
-import matplotlib.pyplot as plt
 
 
 # Leemos nuestros dataframes
