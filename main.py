@@ -3,13 +3,21 @@
 	pip install pandas
 	pip install pandastable
 	pip install -U scikit-learn
+	from sklearn.feature_extraction.text import TfidfVectorizer
+	from sklearn.metrics.pairwise import cosine_similarity
+	from itertools import combinations
+	from sklearn.metrics.pairwise import linear_kernel
 '''
 import pandas as pd
 from pandastable import Table
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from itertools import combinations
+import numpy as np
+import matplotlib as plt
+import seaborn as sns
+import requests as rq
+import time
+import math
+import datetime
 
 from tkinter import *
 from tkinter import ttk
@@ -20,11 +28,6 @@ ratings = pd.read_csv("./ml-latest-small/ratings.csv", sep=",")
 tags = pd.read_csv("./ml-latest-small/tags.csv", sep=",")
 links = pd.read_csv("./ml-latest-small/links.csv", sep=",")
 similitudG = pd.read_csv("./ml-latest-small/similitudG.csv", sep=",")
-similitudS1 = pd.read_csv("./ml-latest-small/similitudS1.csv", sep=",")
-similitudS2 = pd.read_csv("./ml-latest-small/similitudS2.csv", sep=",")
-similitudS3 = pd.read_csv("./ml-latest-small/similitudS3.csv", sep=",")
-similitudS4 = pd.read_csv("./ml-latest-small/similitudS4.csv", sep=",")
-similitudS5 = pd.read_csv("./ml-latest-small/similitudS5.csv", sep=",")
 sinopsisdf = pd.read_csv("./ml-latest-small/sinopsisDB.csv", sep=",")
 
 # Extraemos el año del título
@@ -33,10 +36,6 @@ movies.year = pd.to_datetime(movies.year, format='%Y')
 movies.year = movies.year.dt.year
 movies.title = movies.title.str[:-7]
 
-# TF-IDF para las diferentes combinaciones de géneros
-tf = TfidfVectorizer(analyzer=lambda s: (c for i in range(1,4)
-                     for c in combinations(s.split('|'), r=i)))
-
 class Ventana(Frame):
 	def __init__(self, master, *args):
 		super().__init__( master,*args)
@@ -44,9 +43,6 @@ class Ventana(Frame):
 		# Declaración de variables
 		self.menu = True
 		self.color = True
-
-		self.peli = StringVar()
-		self.peli.set("")
 
 		# Settings frame principal
 		self.frame_top = Frame(self.master, bg='white', height = 50)
@@ -106,8 +102,10 @@ class Ventana(Frame):
 
 		# Página 1 - Recomendador en base a una película
 		Label(self.frame_uno, width=60, text='RECOMENDAR PELÍCULAS EN BASE A UNA PELÍCULA', bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.26, rely=0.05)
-		Label(self.frame_uno, text="Introduzca el título de una Película:", bg='white', fg= 'black', font= ('Arial', 12, 'bold')).place(relx=0.41, rely=0.15)
-		ent1 = Entry(self.frame_uno, textvariable=self.peli, font=('Arial', 15), highlightthickness=3).place(relx=0.42, rely=0.20)
+		Label(self.frame_uno, text="Introduzca el título de una película:", bg='white', fg= 'black', font= ('Arial', 12, 'bold')).place(relx=0.41, rely=0.15)
+		peli = 'none'
+		entryPeli = Entry(self.frame_uno, textvariable=peli, font=('Arial', 15), highlightthickness=3)
+		entryPeli.place(relx=0.42, rely=0.20)
 
 		def generarRecomendacionesGenero(i, M, items, k=10):
 			'''
@@ -116,22 +114,27 @@ class Ventana(Frame):
 			items - dataframe de títulos y géneros
 			k - número de recomendaciones
 			'''
-			ventana_secundaria = Toplevel()
-			ventana_secundaria.title("Recomendación por género")
-			ventana_secundaria.config(width=300, height=200)
-			Label(ventana_secundaria, text='Recomendaciones para: ' + str(i), bg='white', fg= 'black', font= ('Arial', 10, 'bold')).place(relx=0.3, rely=0.05)
-			index = M.loc[:,i].to_numpy().argpartition(range(-1,-k,-1))
-			closest = M.columns[index[-1:-(k+2):-1]]
-			closest = closest.drop(i, errors='ignore')
-			recomendaciones = pd.DataFrame(closest).merge(items).head(k)
-			self.pt = Table(ventana_secundaria, width=280, height=280, dataframe=recomendaciones)
-			self.pt.show()
-			self.pt.place(relx=0.25, rely=0.37)
+			if (i != ''):
+				ventana_secundaria = Toplevel()
+				ventana_secundaria.title("Recomendación por género")
+				ventana_secundaria.config(width=500, height=1000)
+				Label(ventana_secundaria, text='Recomendaciones para: ' + str(i), bg='white', fg= 'black', font= ('Arial', 10, 'bold')).place(relx=0.3, rely=0.05)
 
+				index = M.loc[:,i].to_numpy().argpartition(range(-1,-k,-1))
+				closest = M.columns[index[-1:-(k+2):-1]]
+				closest = closest.drop(i, errors='ignore')
+				recomendaciones = pd.DataFrame(closest).merge(items).head(k)
+				print(recomendaciones)
+				self.pt = Table(ventana_secundaria, width=400, height=600, dataframe=recomendaciones)
+				self.pt.show()
+				self.pt.place(relx=0.25, rely=0.37)
+			else:
+				print('Película no encontrada')
+			
 		def generarRecomendacionesSinopsis(i, M, items, k=10):
 			ventana_secundaria = Toplevel()
 			ventana_secundaria.title("Recomendación por sinopsis")
-			ventana_secundaria.config(width=300, height=200)
+			ventana_secundaria.config(width=500, height=1000)
 			Label(ventana_secundaria, text='Recomendaciones para: ' + str(i), bg='white', fg= 'black', font= ('Arial', 10, 'bold')).place(relx=0.3, rely=0.05)
 			index = M.loc[:,i].to_numpy().argpartition(range(-1,-k,-1))
 			closest = M.columns[index[-1:-(k+2):-1]]
@@ -141,8 +144,8 @@ class Ventana(Frame):
 			self.pt.show()
 			self.pt.place(relx=0.25, rely=0.37)
 
-		Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesGenero('Toy Story', similitud_dfG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28)
-		Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesSinopsis('Toy Story', similitud_dfS, movies[['title', 'genres']])).place(relx=0.4, rely=0.34)
+		Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28)
+		Button(self.frame_uno, width=26, text='RECOMENDAR POR SINOPSIS!', bg='red2', fg='white', font= ('Arial', 13, 'bold'), command= lambda : generarRecomendacionesSinopsis(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.34)
 		self.pt = Table(self.frame_uno, width=760, height=420, dataframe=movies)
 		#, showtoolbar=True, showstatusbar=True
 		self.pt.show()
@@ -162,6 +165,7 @@ class Ventana(Frame):
 			fila_seleccionada = rowclicked_single
 			labTitulo = Label(self.frame_tres, text='Película seleccionada: ' + str(movies.loc[fila_seleccionada, 'title']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.35, rely=0.15)
 			movie_id_sinopsis = int(movies.loc[fila_seleccionada, 'movieId'])
+			print(movie_id_sinopsis)
 			labSinopsis = Label(self.frame_tres, text='Sinopsis: ' + str(sinopsisdf.loc[movie_id_sinopsis, 'sinopsis']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.35, rely=0.35)
 			labRating = Label(self.frame_tres, text='Rating: ' + str(sinopsisdf.loc[movie_id_sinopsis, 'rating']), bg='white', fg= 'black', font= ('Arial', 15, 'bold')).place(relx=0.35, rely=0.55)
 	
