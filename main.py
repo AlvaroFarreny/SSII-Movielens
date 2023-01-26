@@ -31,7 +31,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
+from keras import layers
 
 # Leemos nuestros dataframes
 movies = pd.read_csv("./ml-latest-small/movies.csv", sep=",")
@@ -173,20 +173,6 @@ class Ventana(Frame):
             else:
                 print('Película no encontrada')
 
-        def generarRecomendacionesSinopsis(i, M, items, k=10):
-            ventana_secundaria = Toplevel()
-            ventana_secundaria.title("Recomendación por sinopsis")
-            ventana_secundaria.config(width=500, height=1000)
-            Label(ventana_secundaria, text='Recomendaciones para: ' + str(i), bg='white',
-                  fg='black', font=('Arial', 10, 'bold')).place(relx=0.3, rely=0.05)
-            index = M.loc[:, i].to_numpy().argpartition(range(-1, -k, -1))
-            closest = M.columns[index[-1:-(k+2):-1]]
-            closest = closest.drop(i, errors='ignore')
-            recomendaciones = pd.DataFrame(closest).merge(items).head(k)
-            self.pt = Table(ventana_secundaria, width=280,
-                            height=280, dataframe=recomendaciones)
-            self.pt.show()
-            self.pt.place(relx=0.25, rely=0.37)
         movies_sinopsis2 = movies_sinopsis.drop(columns=["sinopsis", "rating"])
         Button(self.frame_uno, width=26, text='RECOMENDAR POR GÉNEROS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: generarRecomendacionesGenero(entryPeli.get(), similitudG, movies[['title', 'genres']])).place(relx=0.4, rely=0.28)
@@ -206,31 +192,23 @@ class Ventana(Frame):
         Button(self.frame_dos, width=26, text='RECOMENDAR POR USUARIOS!', bg='red2', fg='white', font=('Arial', 13, 'bold'),
                command=lambda: recomendar_a_usuario(self.id_usuario)).place(relx=0.4, rely=0.28)
 
-        top1 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        top1.place(relx=0.44, rely=0.40)
-        top2 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        top2.place(relx=0.44, rely=0.42)
-        top3 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        top3.place(relx=0.44, rely=0.44)
+        top1 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        top1.place(relx=0.44, rely=0.42)
+        top2 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        top2.place(relx=0.44, rely=0.46)
+        top3 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        top3.place(relx=0.44, rely=0.50)
 
-        rec1 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        rec1.place(relx=0.44, rely=0.48)
-        rec2 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        rec2.place(relx=0.44, rely=0.50)
-        rec3 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        rec3.place(relx=0.44, rely=0.52)
-        rec4 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        rec4.place(relx=0.44, rely=0.54)
-        rec5 = Label(self.frame_dos, text="",
-                     bg='white', fg='black', font=('Arial', 10, 'bold'))
-        rec5.place(relx=0.44, rely=0.56)
+        rec1 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec1.place(relx=0.44, rely=0.60)
+        rec2 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec2.place(relx=0.44, rely=0.65)
+        rec3 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec3.place(relx=0.44, rely=0.70)
+        rec4 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec4.place(relx=0.44, rely=0.75)
+        rec5 = Label(self.frame_dos, text="", bg='white', fg='black', font=('Arial', 10, 'bold'))
+        rec5.place(relx=0.44, rely=0.80)
 
         def recomendar_a_usuario(user_id):
             user_id = int(self.id_usuario.get())
@@ -297,7 +275,7 @@ class Ventana(Frame):
             Label(self.frame_dos, text="Estas son tus películas mejor valoradas:",
                   bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.38)
             Label(self.frame_dos, text="Estas son las películas que te aconsejamos:",
-                  bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.46)
+                  bg='white', fg='black', font=('Arial', 11, 'bold')).place(relx=0.42, rely=0.55)
 
             print("Recomendaciones para el usuario: {}".format(user_id))
             print("====" * 9)
